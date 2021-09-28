@@ -30,6 +30,9 @@ class LoomingProtocol(Protocol):
 
     # We specify the name for the dropdown in the GUI
     name = "looming_protocol"
+    stytra_config = dict(
+        camera=dict(type="spinnaker"), recording=dict(extension="mp4"), tracking=dict(method="tail"),
+        dir_save=r'C:\Users\zuidinga\Data\20210916_Test')
 
     def __init__(self):
         super().__init__()
@@ -48,8 +51,8 @@ class LoomingProtocol(Protocol):
         self.n_looms = Param(10, limits=(0, 1000))
         self.max_loom_size = Param(60, limits=(0, 100))
         self.max_loom_duration = Param(5, limits=(0, 100))
-        self.x_pos_pix = Param(100, limits=(0, 2000))
-        self.y_pos_pix = Param(100, limits=(0, 2000))
+        self.x_pos_pix = Param(79.20, limits=(0.0, 2000.0))
+        self.y_pos_pix = Param(59.40, limits=(0.0, 2000.0))
 
     # This is the only function we need to define for a custom protocol
     def get_stim_sequence(self):
@@ -68,7 +71,7 @@ class LoomingProtocol(Protocol):
             #     )
             # )
 
-            time = np.arange(-3.000, 0, 0.005)
+            time = np.arange(-3.000, 0, 0.0005)
             df = pd.DataFrame(dict(time_ms=time * 1000))
             df['angle'] = df.apply(lambda row: 2 * math.atan(-100 / row.time_ms) * (180 / np.pi), axis=1)
             df['include'] = df['angle'].apply(lambda x: 'True' if x >= 5 and x <= 90 else 'False')
@@ -95,4 +98,4 @@ class LoomingProtocol(Protocol):
 
 if __name__ == "__main__":
     # We make a new instance of Stytra with this protocol as the only option:
-    s = Stytra(protocol=LoomingProtocol())
+    s = Stytra(protocol=LoomingProtocol(), display=dict(full_screen=True, window_size=(1920, 1440)))
