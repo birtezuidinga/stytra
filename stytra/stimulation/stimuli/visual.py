@@ -938,7 +938,7 @@ class CalibratedCircleStimulus(VisualStimulus, DynamicStimulus):
         else:
             mm_px = 1
 
-        print(mm_px)
+        # print(mm_px)
 
         # draw the background
         p.setPen(Qt.NoPen)

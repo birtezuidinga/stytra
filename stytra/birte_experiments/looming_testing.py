@@ -30,9 +30,9 @@ class LoomingProtocol(Protocol):
 
     # We specify the name for the dropdown in the GUI
     name = "looming_protocol"
-    stytra_config = dict(
-        camera=dict(type="spinnaker"), recording=dict(extension="mp4"), tracking=dict(method="tail"),
-        dir_save=r'C:\Users\zuidinga\Data\20210916_Test')
+    # stytra_config = dict(
+    #     camera=dict(type="spinnaker"), recording=dict(extension="mp4"), tracking=dict(method="tail"),
+    #     dir_save=r'C:\Users\zuidinga\Data\20210916_Test')
 
     def __init__(self):
         super().__init__()
@@ -53,6 +53,7 @@ class LoomingProtocol(Protocol):
         self.max_loom_duration = Param(5, limits=(0, 100))
         self.x_pos_pix = Param(79.20, limits=(0.0, 2000.0))
         self.y_pos_pix = Param(59.40, limits=(0.0, 2000.0))
+        self.ratio_lm = Param(10, limits=(1, 500))
 
     # This is the only function we need to define for a custom protocol
     def get_stim_sequence(self):
@@ -73,13 +74,14 @@ class LoomingProtocol(Protocol):
 
             time = np.arange(-3.000, 0, 0.0005)
             df = pd.DataFrame(dict(time_ms=time * 1000))
-            df['angle'] = df.apply(lambda row: 2 * math.atan(-100 / row.time_ms) * (180 / np.pi), axis=1)
-            df['include'] = df['angle'].apply(lambda x: 'True' if x >= 5 and x <= 90 else 'False')
+            df['angle'] = df.apply(lambda row: 2 * math.atan(-self.ratio_lm / row.time_ms) * (180 / np.pi), axis=1)
+            df['include'] = df['angle'].apply(lambda x: 'True' if 5 <= x <= 90 else 'False')
             df_include = df.query("include == 'True'")
-            radius_df = df_include.rename(columns={'time_ms': 't', 'angle': 'radius'}).drop(columns='include')
+            df_include['radius'] = df_include['angle'] / 2
+            radius_df = df_include.drop(columns=['include', 'angle']).rename(columns={'time_ms': 't'})
             radius_df['t'] = radius_df['t'] / 1000 + 5
-            radius_df['radius'] = radius_df['radius'] * (316.8 / 360)
-            radius_df = radius_df.append(dict(t=6, radius=79.2), ignore_index=True)
+            radius_df['radius'] = radius_df['radius'] * (158.4 / 180)
+
 
             # We construct looming stimuli with the radius change specification
             # and a random point of origin within the projection area
@@ -95,7 +97,6 @@ class LoomingProtocol(Protocol):
 
         return stimuli
 
-
 if __name__ == "__main__":
     # We make a new instance of Stytra with this protocol as the only option:
-    s = Stytra(protocol=LoomingProtocol(), display=dict(full_screen=True, window_size=(1920, 1440)))
+    s = Stytra(protocol=LoomingProtocol())#, display=dict(full_screen=True, window_size=(1920, 1440)))
