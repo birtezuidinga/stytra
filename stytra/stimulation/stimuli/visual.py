@@ -910,6 +910,8 @@ class CalibratedCircleStimulus(VisualStimulus, DynamicStimulus):
     circle_color : tuple(int, int, int)
         RGB color of the circle
 
+    curved_screen :
+
 
     """
 
@@ -920,6 +922,7 @@ class CalibratedCircleStimulus(VisualStimulus, DynamicStimulus):
         radius=10,
         background_color=(0, 0, 0),
         circle_color=(255, 255, 255),
+        curved_screen=False,
         **kwargs
     ):
         super().__init__(*args, dynamic_parameters=["x", "y", "radius"], **kwargs)
@@ -929,6 +932,8 @@ class CalibratedCircleStimulus(VisualStimulus, DynamicStimulus):
         self.background_color = background_color
         self.circle_color = circle_color
         self.name = "circle"
+        self.curved_screen = curved_screen
+
 
     def paint(self, p, w, h):
         super().paint(p, w, h)
@@ -938,7 +943,10 @@ class CalibratedCircleStimulus(VisualStimulus, DynamicStimulus):
         else:
             mm_px = 1
 
-        # print(mm_px)
+        # for a curved screen, the radius of the circle can be defined as degrees of visual space in the protocol,
+        # here it is converted back to mm, based on the calibration of the screen
+        if self.curved_screen:
+            self.radius = self.radius / 180 * (self._experiment.display_config['window_size'][0] * mm_px)
 
         # draw the background
         p.setPen(Qt.NoPen)
@@ -983,3 +991,32 @@ class FixationCrossStimulus(FullFieldVisualStimulus):
         h_p = h * self.position[1]
         p.drawLine(w_p - l, h_p, w_p + l, h_p)
         p.drawLine(w_p, h_p - l, w_p, h_p + l)
+
+class TriggerSquare(VisualStimulus, InterpolatedStimulus):
+    """ Class for painting a square of a specific color.
+
+    Parameters
+    ----------
+    color : (int, int, int) tuple
+         color of the square (int tuple)
+    """
+
+    def __init__(self, *args, color=(0, 0, 0), square_width=15, active=False, **kwargs):
+        """ """
+        self.active = active
+        super().__init__(*args, dynamic_parameters=["active"], **kwargs)
+        self.color = color
+        self.name = "trigger_square"
+        self.square_width = square_width
+
+    def paint(self, p, w, h):
+        p.setPen(Qt.NoPen)
+        p.setBrush(QBrush(QColor(*self.color)))  # Use chosen color
+        p.drawRect(QRect(0, h - self.square_width, self.square_width, self.square_width))  # draw rectangle in lower left corner
+
+    def update(self):
+        super().update()
+        if self.active:
+            self.color = (255, 255, 255)
+        else:
+            self.color = (0, 0, 0)
