@@ -75,7 +75,7 @@ class LoomingProtocol(Protocol):
             time = np.arange(-3.000, 0, 0.0005)
             df = pd.DataFrame(dict(time_ms=time * 1000))
             df['angle'] = df.apply(lambda row: 2 * math.atan(-self.ratio_lm / row.time_ms) * (180 / np.pi), axis=1)
-            df['include'] = df['angle'].apply(lambda x: 'True' if 5 <= x <= 90 else 'False')
+            df['include'] = df['angle'].apply(lambda x: 'True' if 5 <= x <= 180 else 'False')
             df_include = df.query("include == 'True'")
             df_include['radius'] = df_include['angle'] / 2
             radius_df = df_include.drop(columns=['include', 'angle']).rename(columns={'time_ms': 't'})

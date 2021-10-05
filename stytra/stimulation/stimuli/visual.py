@@ -1001,7 +1001,7 @@ class TriggerSquare(VisualStimulus, InterpolatedStimulus):
          color of the square (int tuple)
     """
 
-    def __init__(self, *args, color=(0, 0, 0), square_width=15, active=False, **kwargs):
+    def __init__(self, *args, color=(0, 0, 0), square_width=40, active=False, **kwargs):
         """ """
         self.active = active
         super().__init__(*args, dynamic_parameters=["active"], **kwargs)
