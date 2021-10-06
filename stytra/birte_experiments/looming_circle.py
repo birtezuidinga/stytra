@@ -4,11 +4,11 @@ import math
 
 from stytra import Stytra
 from stytra.stimulation import Protocol
-from stytra.stimulation.stimuli import InterpolatedStimulus, CalibratedCircleStimulus, CombinerStimulus, TriggerSquare
+from stytra.stimulation.stimuli import InterpolatedStimulus, CurvedScreenCircleStimulus, CombinerStimulus, TriggerSquare
 from lightparam import Param
 
 
-class LoomingStimulus(InterpolatedStimulus, CalibratedCircleStimulus):
+class LoomingStimulus(InterpolatedStimulus, CurvedScreenCircleStimulus):
     name = "looming_stimulus"
 
 
@@ -19,9 +19,10 @@ class CombinedLoomingTriggerPixel(Protocol):
 
         super().__init__()
 
-        self.x_pos_pix = Param(79.20, limits=(0.0, 2000.0))
-        self.y_pos_pix = Param(59.40, limits=(0.0, 2000.0))
+        self.x_pos = Param(0.5, limits=(0.0, 1.0))
+        self.y_pos = Param(0.5, limits=(0.0, 1.0))
         self.ratio_lm = Param(100, limits=(1, 1000))
+        self.max_loom_diameter = Param(180, limits=(1, 180))
         self.contrast = Param(50, limits=(0, 255))
         self.looming_duration = Param(25, limits=(1, 1000.0))
 
@@ -30,6 +31,7 @@ class CombinedLoomingTriggerPixel(Protocol):
         ratio_lm = self.ratio_lm
         looming_duration = self.looming_duration
         contrast = self.contrast
+        max_loom_diameter = self.max_loom_diameter
 
         stimuli = []
 
@@ -37,7 +39,7 @@ class CombinedLoomingTriggerPixel(Protocol):
         time = np.arange(-looming_duration, 0, 0.0005)
         df = pd.DataFrame(dict(time_ms=time * 1000))
         df['angle'] = df.apply(lambda row: 2 * math.atan(-ratio_lm / row.time_ms) * (180 / np.pi), axis=1)
-        df['include'] = df['angle'].apply(lambda x: 'True' if 1 <= x <= 180 else 'False')
+        df['include'] = df['angle'].apply(lambda x: 'True' if x <= max_loom_diameter else 'False')
         df_include = df.query("include == 'True'")
         df_include['radius'] = df_include['angle'] / 2
         radius_df = df_include.drop(columns=['include', 'angle']).rename(columns={'time_ms': 't'})
@@ -51,7 +53,7 @@ class CombinedLoomingTriggerPixel(Protocol):
                 background_color=(bc, bc, bc),
                 circle_color=(cc, cc, cc),
                 df_param=radius_df,
-                origin=(self.x_pos_pix, self.y_pos_pix),
+                origin=(self.x_pos, self.y_pos),
                 curved_screen=True
             )
 

@@ -961,6 +961,78 @@ class CalibratedCircleStimulus(VisualStimulus, DynamicStimulus):
                       self.radius / mm_px, self.radius / mm_px)
 
 
+class CurvedScreenCircleStimulus(VisualStimulus, DynamicStimulus):
+    """ A filled circle stimulus, which in combination with interpolation
+    can be used to make looming stimuli
+
+    Parameters
+    ---------
+    origin : tuple(float, float)
+        positions of the circle centre (as fraction of screen size)
+
+    radius : float
+        circle radius (in deg for curved_screen == True, in mm for curved_screen == False)
+
+    backgroud_color : tuple(int, int, int)
+        RGB color of the background
+
+    circle_color : tuple(int, int, int)
+        RGB color of the circle
+
+    curved_screen : bool
+        when using a curved screen (as half a cylinder, 180 degrees horizontally), setting this to True enables you to
+        provide the radius of the circle in degrees of visual space instead of mm. It will be calculated to pixels
+        based on the display window settings.
+
+    """
+
+    def __init__(
+        self,
+        *args,
+        origin=(0.5, 0.5),
+        radius=10,
+        background_color=(0, 0, 0),
+        circle_color=(255, 255, 255),
+        curved_screen=False,
+        **kwargs
+    ):
+        super().__init__(*args, dynamic_parameters=["x", "y", "radius"], **kwargs)
+        self.x = origin[0]
+        self.y = origin[1]
+        self.radius = radius
+        self.background_color = background_color
+        self.circle_color = circle_color
+        self.name = "circle"
+        self.curved_screen = curved_screen
+
+    def paint(self, p, w, h):
+        super().paint(p, w, h)
+
+        if self._experiment.calibrator is not None:
+            mm_px = self._experiment.calibrator.mm_px
+        else:
+            mm_px = 1
+
+        # for a curved screen, the radius of the circle can be defined as degrees of visual space in the protocol,
+        # here it is converted back to mm, based on the calibration of the screen
+        if self.curved_screen:
+            self.radius = self.radius / 180 * (w * mm_px)
+
+        x = self.x * w
+        y = self.y * h
+
+        # draw the background
+        p.setPen(Qt.NoPen)
+        p.setBrush(QBrush(QColor(*self.background_color)))
+        self.clip(p, w, h)
+        p.drawRect(QRect(-1, -1, w + 2, h + 2))
+
+        # draw the circle
+        p.setBrush(QBrush(QColor(*self.circle_color)))
+        p.drawEllipse(QPointF(x, y),
+                      self.radius / mm_px, self.radius / mm_px)
+
+
 class FixationCrossStimulus(FullFieldVisualStimulus):
     """ Draws a simple cross in the center of the visual field
 
