@@ -549,7 +549,7 @@ class PaintGratingStimulus(BackgroundStimulus):
         )
 
 
-class MovingGratingStimulus(PaintGratingStimulus, InterpolatedStimulus):
+class MovingGratingStimulus2(GratingStimulus, InterpolatedStimulus):
     # TODO refactor to cisambiguate
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
