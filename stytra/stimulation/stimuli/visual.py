@@ -910,10 +910,6 @@ class CalibratedCircleStimulus(VisualStimulus, DynamicStimulus):
     circle_color : tuple(int, int, int)
         RGB color of the circle
 
-    curved_screen : bool
-        when using a curved screen (as half a cylinder, 180 degrees horizontally), setting this to True enables you to
-        provide the radius of the circle in degrees of visual space instead of mm. It will be calculated to pixels
-        based on the display window settings.
 
     """
 
@@ -924,7 +920,6 @@ class CalibratedCircleStimulus(VisualStimulus, DynamicStimulus):
         radius=10,
         background_color=(0, 0, 0),
         circle_color=(255, 255, 255),
-        curved_screen=False,
         **kwargs
     ):
         super().__init__(*args, dynamic_parameters=["x", "y", "radius"], **kwargs)
@@ -934,7 +929,6 @@ class CalibratedCircleStimulus(VisualStimulus, DynamicStimulus):
         self.background_color = background_color
         self.circle_color = circle_color
         self.name = "circle"
-        self.curved_screen = curved_screen
 
     def paint(self, p, w, h):
         super().paint(p, w, h)
@@ -943,11 +937,6 @@ class CalibratedCircleStimulus(VisualStimulus, DynamicStimulus):
             mm_px = self._experiment.calibrator.mm_px
         else:
             mm_px = 1
-
-        # for a curved screen, the radius of the circle can be defined as degrees of visual space in the protocol,
-        # here it is converted back to mm, based on the calibration of the screen
-        if self.curved_screen:
-            self.radius = self.radius / 180 * (self._experiment.display_config['window_size'][0] * mm_px)
 
         # draw the background
         p.setPen(Qt.NoPen)
