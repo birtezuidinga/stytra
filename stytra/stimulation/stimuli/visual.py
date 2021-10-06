@@ -428,6 +428,7 @@ class SeamlessImageStimulus(BaseSeamlessImageStimulus, BackgroundStimulus):
 class CenteredSeamlessImageStimulus(BaseSeamlessImageStimulus, CenteredBackgroundStimulus):
     pass
 
+
 class GratingStimulus(BackgroundStimulus):
     """ Class for creating a grating pattern by tiling a numpy array that
     defines the stimulus profile. Can be square or sinusoidal.
@@ -553,7 +554,7 @@ class PaintGratingStimulus(BackgroundStimulus):
         )
 
 
-class MovingGratingStimulus(PaintGratingStimulus, InterpolatedStimulus):
+class MovingGratingStimulus2(GratingStimulus, InterpolatedStimulus):
     # TODO refactor to cisambiguate
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
