@@ -910,8 +910,10 @@ class CalibratedCircleStimulus(VisualStimulus, DynamicStimulus):
     circle_color : tuple(int, int, int)
         RGB color of the circle
 
-    curved_screen :
-
+    curved_screen : bool
+        when using a curved screen (as half a cylinder, 180 degrees horizontally), setting this to True enables you to
+        provide the radius of the circle in degrees of visual space instead of mm. It will be calculated to pixels
+        based on the display window settings.
 
     """
 
@@ -992,13 +994,20 @@ class FixationCrossStimulus(FullFieldVisualStimulus):
         p.drawLine(w_p - l, h_p, w_p + l, h_p)
         p.drawLine(w_p, h_p - l, w_p, h_p + l)
 
+
 class TriggerSquare(VisualStimulus, InterpolatedStimulus):
     """ Class for painting a square of a specific color.
 
     Parameters
     ----------
     color : (int, int, int) tuple
-         color of the square (int tuple)
+        color of the square (int tuple)
+
+    square_width : int
+        square width in pixels
+
+    active : bool
+        white if True, black if False
     """
 
     def __init__(self, *args, color=(0, 0, 0), square_width=40, active=False, **kwargs):
