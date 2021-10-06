@@ -936,7 +936,6 @@ class CalibratedCircleStimulus(VisualStimulus, DynamicStimulus):
         self.name = "circle"
         self.curved_screen = curved_screen
 
-
     def paint(self, p, w, h):
         super().paint(p, w, h)
 

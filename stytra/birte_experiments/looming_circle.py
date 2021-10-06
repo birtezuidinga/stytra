@@ -23,23 +23,29 @@ class CombinedLoomingTriggerPixel(Protocol):
         self.y_pos_pix = Param(59.40, limits=(0.0, 2000.0))
         self.ratio_lm = Param(100, limits=(1, 1000))
         self.contrast = Param(50, limits=(0, 255))
+        self.looming_duration = Param(25, limits=(1, 1000.0))
 
     def get_stim_sequence(self):
+        start_trigger_duration = 2
+        ratio_lm = self.ratio_lm
+        looming_duration = self.looming_duration
+        contrast = self.contrast
+
         stimuli = []
 
         # Looming stimulus
-        time = np.arange(-25.000, 0, 0.0005)
+        time = np.arange(-looming_duration, 0, 0.0005)
         df = pd.DataFrame(dict(time_ms=time * 1000))
-        df['angle'] = df.apply(lambda row: 2 * math.atan(-self.ratio_lm / row.time_ms) * (180 / np.pi), axis=1)
-        df['include'] = df['angle'].apply(lambda x: 'True' if 5 <= x <= 180 else 'False')
+        df['angle'] = df.apply(lambda row: 2 * math.atan(-ratio_lm / row.time_ms) * (180 / np.pi), axis=1)
+        df['include'] = df['angle'].apply(lambda x: 'True' if 1 <= x <= 180 else 'False')
         df_include = df.query("include == 'True'")
         df_include['radius'] = df_include['angle'] / 2
         radius_df = df_include.drop(columns=['include', 'angle']).rename(columns={'time_ms': 't'})
-        radius_df['t'] = radius_df['t'] / 1000 + 27
+        radius_df['t'] = radius_df['t'] / 1000 + looming_duration + start_trigger_duration
         radius_df = radius_df.reset_index(drop=True)
 
-        bc = 127.5 + self.contrast/2
-        cc = 127.5 - self.contrast/2
+        bc = 127.5 + contrast/2
+        cc = 127.5 - contrast/2
 
         stimuli_loom = LoomingStimulus(
                 background_color=(bc, bc, bc),
@@ -50,13 +56,12 @@ class CombinedLoomingTriggerPixel(Protocol):
             )
 
         # Trigger pixel
-        last_looming_t = radius_df.iloc[-1, 0]
+        last_t = radius_df.iloc[-1, 0]
         active_df = pd.DataFrame(
             dict(
-                t=[0, 1, 1, 1.03, 1.03, 1.06, 1.06, 1.09, 1.09, 1.12, 1.12, 1.15, 1.15, 2,
-                   last_looming_t + 3, last_looming_t + 3, last_looming_t + 3.04, last_looming_t + 3.04,
-                   last_looming_t + 3.08, last_looming_t + 3.08, last_looming_t + 3.12, last_looming_t + 3.12,
-                   last_looming_t + 4],
+                t=[0, 1, 1, 1.2, 1.2, 1.3, 1.3, 1.5, 1.5, 1.6, 1.6, 1.8, 1.8, start_trigger_duration,
+                   last_t + 3, last_t + 3, last_t + 3.2, last_t + 3.2,
+                   last_t + 3.3, last_t + 3.3, last_t + 3.5, last_t + 3.5, last_t + 4],
                 active=[False, False, True, True, False, False, True, True, False, False, True, True, False, False,
                         False, True, True, False, False, True, True, False, False]
             )
