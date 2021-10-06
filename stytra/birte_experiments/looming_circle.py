@@ -9,11 +9,11 @@ from lightparam import Param
 
 
 class LoomingStimulus(InterpolatedStimulus, CurvedScreenCircleStimulus):
-    name = "looming_stimulus"
+    name = "looming_curved_screen_stimulus"
 
 
 class CombinedLoomingTriggerPixel(Protocol):
-    name = "combined_looming_triggerpixel_protocol"
+    name = "combined_looming_curved_screen_triggerpixel_protocol"
 
     def __init__(self):
 
