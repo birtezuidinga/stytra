@@ -30,43 +30,15 @@ class MovingSineGratingProtocol(Protocol):
         phase = np.sin(2 * np.pi * t * self.windmill_freq) * self.theta_amp
 
         t = [t[0]] + list(t + p) + [(t + 2 * p)[-1]]
-        phase = [phase[0]] + list(phase) + [phase[-1]]
-        df = pd.DataFrame(dict(t=t, theta=phase))
+        x = [phase[0]] + list(phase) + [phase[-1]]
+        df = pd.DataFrame(dict(t=t, x=x))
         stimuli.append(
             MovingSineGrating(
                 df_param=df, n_arms=self.n_arms, wave_shape=self.wave_shape
             )
         )
         return stimuli
-    #
-    #     self.t_pre = Param(5.0)  # time of still gratings before they move
-    #     self.t_move = Param(5.0)  # time of gratings movement
-    #     self.grating_vel = Param(-10.0)  # gratings velocity
-    #     self.grating_period = Param(10)  # grating spatial period
-    #     self.grating_angle_deg = Param(90.0)  # grating orientation
 
-    # def get_stim_sequence(self):
-    #     # Use six points to specify the velocity step to be interpolated:
-    #     t = [
-    #         0,
-    #         self.t_pre,
-    #         self.t_pre,
-    #         self.t_pre + self.t_move,
-    #         self.t_pre + self.t_move,
-    #         2 * self.t_pre + self.t_move,
-    #     ]
-    #
-    #     vel = [0, 0, self.grating_vel, self.grating_vel, 0, 0]
-    #
-    #     df = pd.DataFrame(dict(t=t, vel_x=vel))
-    #
-    #     return [
-    #         MovingSineGrating(
-    #             df_param=df,
-    #             grating_angle=self.grating_angle_deg * np.pi / 180,
-    #             grating_period=self.grating_period,
-    #         )
-    #     ]
 
 if __name__ == "__main__":
     # We make a new instance of Stytra with this protocol as the only option:

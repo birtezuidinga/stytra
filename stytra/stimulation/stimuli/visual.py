@@ -1112,7 +1112,6 @@ class SineGrating(CenteredBackgroundStimulus):
         wave_shape="sinusoidal",
         color_2=(0,) * 3,
         n_arms=8,
-        phase=0,
         **kwargs
     ):
         super().__init__(*args, **kwargs)
@@ -1123,7 +1122,6 @@ class SineGrating(CenteredBackgroundStimulus):
         self.name = "sinegrating"
         self._pattern = None
         self._qbackground = None
-        self.phase = phase
 
     def create_pattern(self, side_len=1000):
 
@@ -1147,7 +1145,7 @@ class SineGrating(CenteredBackgroundStimulus):
         if self._qbackground.height() < h * 1.5 or self._qbackground.width() < w * 1.5:
             self.create_pattern(1.5 * np.max([h, w]))
 
-        point.setX((w - self._qbackground.width()) / 2 )
+        point.setX(self.x)
         point.setY((h - self._qbackground.height()) / 2)
         p.setRenderHint(QPainter.HighQualityAntialiasing)
         p.drawImage(point, self._qbackground)
@@ -1156,4 +1154,4 @@ class SineGrating(CenteredBackgroundStimulus):
 class MovingSineGrating(SineGrating, InterpolatedStimulus):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.dynamic_parameters.append("phase")
+        self.dynamic_parameters.append("x")
