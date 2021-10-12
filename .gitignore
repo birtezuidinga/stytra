@@ -98,3 +98,4 @@ docs/source/_static/*.mp4
 
 # MacOS stuff:
 .DS_Store
+/stytra/birte_experiments/assets/
