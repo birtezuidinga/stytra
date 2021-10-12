@@ -35,7 +35,8 @@ class MovingTiledGrating(Protocol):
         return [
             Stim(
                 background="generated_pattern.png",
-                df_param=pd.DataFrame(dict(t=[0, 10], vel_x=[10, 10], vel_y=[0, 0])))]
+                df_param=pd.DataFrame(dict(t=[0, 10], vel_x=[10, 10], vel_y=[0, 0])),
+                rotation=30)]
 
 
 if __name__ == "__main__":
