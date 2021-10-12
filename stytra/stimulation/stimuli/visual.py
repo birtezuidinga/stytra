@@ -381,10 +381,11 @@ class BaseSeamlessImageStimulus():
     some image editing any texture can be adjusted to be seamless.
     """
 
-    def __init__(self, *args, background, background_name=None, **kwargs):
+    def __init__(self, *args, background, background_name=None, rotation, **kwargs):
         super().__init__(*args, **kwargs)
         self.name = "seamless_image"
         self._background = background
+        self.theta = rotation
         if background_name is not None:
             self.background_name = background_name
         else:
@@ -1127,15 +1128,16 @@ class SineGrating(CenteredBackgroundStimulus):
 
         x = (np.arange(side_len) - side_len / 2) / side_len
         xx, yy = np.meshgrid(x, x)  # grid of points
-        W = np.cos(xx * 6 * 2 * np.pi)    # evaluation of the function
+        W = np.cos(xx * 3 * 2 * np.pi)    # evaluation of the function
         W = W[:, :, np.newaxis]  # normalize and add color axis
 
         if self.wave_shape == "square":
-            W = (W > 0.5).astype(np.uint8)  # binarize for square gratings
+            W = (W > 0).astype(np.uint8)  # binarize for square gratings
 
         # Multiply by color:
         self._pattern = W * self.color_1 + (1 - W) * self.color_2
         self._qbackground = qimage2ndarray.array2qimage(self._pattern)
+        self._qbackground.save("assets/test2.png")
 
     def initialise_external(self, experiment):
         super().initialise_external(experiment)
@@ -1155,3 +1157,53 @@ class MovingSineGrating(SineGrating, InterpolatedStimulus):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.dynamic_parameters.append("x")
+
+
+class SaveGratingImage(CenteredBackgroundStimulus):
+    """ Class for drawing a sine grating.
+    For moving gratings use subclass
+
+    Parameters
+    ----------
+    period : int
+        number of colored arms of the windmill
+    color : (int, int, int) tuple
+        color for the non-black stripes (int tuple)
+
+    """
+
+    def __init__(
+        self,
+        *args,
+        color_1=(255,) * 3,
+        wave_shape="sinusoidal",
+        color_2=(0,) * 3,
+        **kwargs
+    ):
+        super().__init__(*args, **kwargs)
+        self.color_1 = color_1
+        self.color_2 = color_2
+        self.wave_shape = wave_shape
+        self.name = "sinegrating"
+        self._pattern = None
+        self._qbackground = None
+
+    def create_pattern(self, side_len=1000):
+
+        x = (np.arange(side_len) - side_len / 2) / side_len
+        xx, yy = np.meshgrid(x, x)  # grid of points
+        W = np.cos(xx * 3 * 2 * np.pi)    # evaluation of the function
+        W = W[:, :, np.newaxis]  # normalize and add color axis
+
+        if self.wave_shape == "square":
+            W = (W > 0).astype(np.uint8)  # binarize for square gratings
+
+        # Multiply by color:
+        self._pattern = W * self.color_1 + (1 - W) * self.color_2
+        self._qbackground = qimage2ndarray.array2qimage(self._pattern)
+        self._qbackground.save("test2.png")
+
+
+class TiledSineGrating(SaveGratingImage, BaseSeamlessImageStimulus):
+    pass
+
