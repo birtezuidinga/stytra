@@ -28,12 +28,21 @@ class CombinedMovingTiledGrating(Protocol):
 
     def __init__(self):
         super().__init__()
-        # create_pattern(side_len=1000, wave_shape="sine", color_1=(255, 255, 255), color_2=(0, 0, 0))
+        self.display_width_px = Param(960, limits=(10, 5000))
+        self.wave_shape = Param("sine", limits=["sine", "square"])
+        self.contrast = Param(100, limits=(0, 255))
 
     def get_stim_sequence(self):
+        display_width_px = self.display_width_px
+        shape = self.wave_shape
+        contrast = self.contrast
+
+        c1 = 127.5 + contrast / 2
+        c2 = 127.5 - contrast / 2
+
         Stim = type("stim", (SeamlessImageStimulus, InterpolatedStimulus), {})
 
-        create_pattern(side_len=960, wave_shape="sine", color_1=(255, 255, 255), color_2=(0, 0, 0), path="assets/generated_pattern.png")
+        create_pattern(side_len=display_width_px, wave_shape=shape, color_1=(c1, c1, c1), color_2=(c2, c2, c2), path="assets/generated_pattern.png")
         s_a = Stim(
                 background="generated_pattern.png",
                 df_param=pd.DataFrame(dict(t=[0, 10], vel_x=[10, 10], vel_y=[0, 0])),
