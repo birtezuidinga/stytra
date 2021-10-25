@@ -49,13 +49,13 @@ class CombinedMovingTiledGrating(Protocol):
 
         s_a = Stim(
                 background="generated_pattern.png",
-                df_param=pd.DataFrame(dict(t=[0, 10], vel_x=[vel, vel], vel_y=[0, 0])),
+                df_param=pd.DataFrame(dict(t=[0, 30], vel_x=[vel, vel], vel_y=[0, 0])),
                 clip_mask=[0, 0, 0.5, 1],
                 rotation=np.pi)
 
         s_b = Stim(
                 background="generated_pattern.png",
-                df_param=pd.DataFrame(dict(t=[0, 10], vel_x=[vel, vel], vel_y=[0, 0])),
+                df_param=pd.DataFrame(dict(t=[0, 30], vel_x=[vel, vel], vel_y=[0, 0])),
                 clip_mask=[0.5, 0, 0.5, 1],
                 rotation=0)
 
