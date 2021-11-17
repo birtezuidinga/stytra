@@ -191,7 +191,7 @@ class Experiment(QObject):
         return foldername
 
     def filename_prefix(self):
-        return self.session_id + "_"
+        return self.animal_id + "_" + self.session_id + "_"
 
     def filename_base(self):
         # Save clean json file as timestamped Ymd_HMS_metadata.h5 files:
