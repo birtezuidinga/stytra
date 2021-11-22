@@ -32,8 +32,8 @@ class CombinedMovingTiledGrating(Protocol):
         self.display_width_px = Param(1920, limits=(10, 5000))
         self.wave_shape = Param("sine", limits=["sine", "square"])
         self.wave_period = Param(30, limits=(1, 1000))  # in degrees
-        self.contrast = Param(100, limits=(0, 255))
-        self.velocity = Param(20, limits=(-1000, 1000))
+        self.contrast = Param(100.0, limits=(0, 255))
+        self.velocity = Param(20.0, limits=(-1000.0, 1000.0))
         self.duration = Param(20, limits=(1., 1000))
 
     def get_stim_sequence(self):
