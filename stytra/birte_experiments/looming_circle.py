@@ -21,14 +21,14 @@ class CombinedLoomingTriggerPixel(Protocol):
 
         self.x_pos = Param(0.5, limits=(0.0, 1.0))
         self.y_pos = Param(0.5, limits=(0.0, 1.0))
-        self.ratio_lm = Param(100, limits=(1, 1000))
+        self.ratio_lv = Param(100, limits=(1, 1000))
         self.max_loom_diameter = Param(180, limits=(1, 180))
         self.contrast = Param(50, limits=(0, 255))
         self.looming_duration = Param(25, limits=(1, 1000.0))
 
     def get_stim_sequence(self):
         start_trigger_duration = 2
-        ratio_lm = self.ratio_lm
+        ratio_lv = self.ratio_lv
         looming_duration = self.looming_duration
         contrast = self.contrast
         max_loom_diameter = self.max_loom_diameter
@@ -38,7 +38,7 @@ class CombinedLoomingTriggerPixel(Protocol):
         # Looming stimulus
         time = np.arange(-looming_duration, 0, 0.0005)
         df = pd.DataFrame(dict(time_ms=time * 1000))
-        df['angle'] = df.apply(lambda row: 2 * math.atan(-ratio_lm / row.time_ms) * (180 / np.pi), axis=1)
+        df['angle'] = df.apply(lambda row: 2 * math.atan(-ratio_lv / row.time_ms) * (180 / np.pi), axis=1)
         df['include'] = df['angle'].apply(lambda x: 'True' if x <= max_loom_diameter else 'False')
         df_include = df.query("include == 'True'")
         df_include['radius'] = df_include['angle'] / 2
