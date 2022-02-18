@@ -72,7 +72,6 @@ class CombinedLoomingTriggerPixel(Protocol):
         triggerpixel = TriggerSquare(df_param=active_df)
 
         stimuli.append(CombinerStimulus([stimuli_loom, triggerpixel]))
-
         return stimuli
 
 
