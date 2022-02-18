@@ -63,12 +63,12 @@ class PiPicoCommProtocol(Protocol):
         self.post_duration = Param(3.0, limits=(0.0, 1000.0))
 
     def get_stim_sequence(self):
-        stimuli = PiPicoCommStimulus(pin_value=1, duration=self.opto_duration)
+        # stimuli = PiPicoCommStimulus(pin_value=1, duration=self.opto_duration)
+        stimuli = []
+        stimuli.append(Pause(duration=4))
+        stimuli.append(PiPicoCommStimulus(pin_value=1, duration=5))
+        stimuli.append(PiPicoCommStimulus(pin_value=0, duration=5))
 
-        # for i in range(5):
-        #     stimuli.append(Pause(duration=4))
-        #     stimuli.append(PiPicoCommStimulus(pin_value=1, duration=0))
-        #     stimuli.append(PiPicoCommStimulus(pin_value=0, duration=0))
         return stimuli
 # i think that they call here  ArduinoCommStimulus one time to write "b" in our case we have to give here a value
 # to the function which allows us to set or clear the pin stimuli.append(ArduinoCommStimulus(duration=0, pin_value = 1)) or
