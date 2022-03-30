@@ -1,7 +1,6 @@
 from stytra import Stytra, Protocol
 from stytra.stimulation.stimuli.generic_stimuli import Stimulus
 from stytra.stimulation.stimuli.visual import Pause
-from stytra.hardware.serial import SerialConnection
 from lightparam import Param
 import datetime
 
@@ -55,28 +54,13 @@ class PiPicoCommStimulus(Stimulus):
 
     def start(self):
         """ """
-        # we have to use the Pin value to decide if set or clear has to be done
-        # self._pyb.write("b")  # send blinking command at stimulus start
         if self.pin_value == 1:
-            # print(self._Pico)
             self._Pico.set_Pin(0)
             print("start")
         else:
             self._Pico.clear_Pin(0)
             print("start_clear")
-        self.real_time_start = datetime.datetime.now() # getting starttime after pin is setted
-
-    # def update(self):
-    #     super().update()
-    #     if self.pin_value == 1:
-    #         # print(self._Pico)
-    #         self._Pico.set_Pin(0)
-    #         print("update_1")
-    #     else:
-    #         self._Pico.clear_Pin(0)
-    #         print("update_0")
-    #     self.real_time_stop = datetime.datetime.now() # getting stoptime after pin is updated
-
+        self.real_time_start = datetime.datetime.now() # getting starttime after pin is set
 
 # also change names here
 class PiPicoCommProtocol(Protocol):
@@ -84,23 +68,17 @@ class PiPicoCommProtocol(Protocol):
 
     def __init__(self):
         super().__init__()
-        # added the unit and set loadable to false this helps to get the right timing (in the Logging and on the LED)
-        # perhaps the variables are overwritten somewhere in the software
         self.pre_duration = Param(10.0, limits=(0.0, 1000.0), unit="s")  #, loadable=False)
         self.opto_duration = Param(2.0, limits=(0.0, 1000.0), unit="s")  #, loadable=False)
         self.post_duration = Param(3.0, limits=(0.0, 1000.0), unit="s")  #, loadable=False)
 
     def get_stim_sequence(self):
-        # stimuli = PiPicoCommStimulus(pin_value=1, duration=self.opto_duration)
         stimuli = []
         stimuli.append(Pause(duration=self.pre_duration))
         stimuli.append(PiPicoCommStimulus(pin_value=1, duration=self.opto_duration))
         stimuli.append(PiPicoCommStimulus(pin_value=0, duration=self.post_duration))
 
         return stimuli
-# i think that they call here  ArduinoCommStimulus one time to write "b" in our case we have to give here a value
-# to the function which allows us to set or clear the pin stimuli.append(ArduinoCommStimulus(duration=0, pin_value = 1)) or
-# to make a second class which then clears the pin
 
 
 if __name__ == "__main__":
