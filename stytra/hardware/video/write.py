@@ -100,11 +100,11 @@ class VideoWriter(FrameProcess):
                     # Since the filename is given asynchronously, check if we have the filename.
                     # Otherwise, use the fallback.
                     if self.__filename_base is not None:
-                        self._complete(self.__filename_base)
+                        self._complete(self._get_filename_base())
                     else:
                         try:
                             self.__filename_base = self.filename_queue.get(timeout=1)
-                            self._complete(self.__filename_base)
+                            self._complete(self.__filename_base())
                         except Empty:
                             self._complete(self.CONST_FALLBACK_FILENAME)
 
@@ -131,6 +131,7 @@ class VideoWriter(FrameProcess):
         if self.__filename_base is None:
             try:
                 self.__filename_base = self.filename_queue.get(timeout=0.01)
+
             except Empty:
                 # Try again later.
                 pass
@@ -188,7 +189,12 @@ class VideoWriter(FrameProcess):
         the filename_base variable.
         """
 
-        return self.__filename_base
+        filename_base = self.__filename_base
+        detailed_name = str(filename_base.parts[-2]) + "_" + str(filename_base.name)
+        directory = filename_base.parent
+        new_filename_base = directory / detailed_name
+
+        return new_filename_base
 
 
 class H5VideoWriter(VideoWriter):
