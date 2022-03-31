@@ -188,7 +188,7 @@ class VideoWriter(FrameProcess):
         -------
         the filename_base variable.
         """
-        filename = Path(self.__filename_base)
+        filename = self.__filename_base
         detailed_name = str(filename.parts[-2]) + "_" + str(filename.name)
         directory = filename.parent
         new_filename_base = directory / detailed_name
