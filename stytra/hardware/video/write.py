@@ -100,11 +100,11 @@ class VideoWriter(FrameProcess):
                     # Since the filename is given asynchronously, check if we have the filename.
                     # Otherwise, use the fallback.
                     if self.__filename_base is not None:
-                        self._complete(self._get_filename_base())
+                        self._complete(self.__filename_base)
                     else:
                         try:
                             self.__filename_base = self.filename_queue.get(timeout=1)
-                            self._complete(self.__filename_base())
+                            self._complete(self.__filename_base)
                         except Empty:
                             self._complete(self.CONST_FALLBACK_FILENAME)
 
@@ -119,7 +119,6 @@ class VideoWriter(FrameProcess):
         Runs the necessary configuration before the recording starts.
         Sets the filename of the video file.
         Can be extended by subclasses for additional configuration.
-
         Parameters
         ----------
         size
@@ -131,7 +130,6 @@ class VideoWriter(FrameProcess):
         if self.__filename_base is None:
             try:
                 self.__filename_base = self.filename_queue.get(timeout=0.01)
-
             except Empty:
                 # Try again later.
                 pass
@@ -140,7 +138,6 @@ class VideoWriter(FrameProcess):
     def _ingest_frame(self, frame: np.ndarray) -> None:
         """ "
         Abstract method that should contain logic to process (and potentially save) the frame.
-
         Parameters
         ----------
         frame
@@ -152,7 +149,6 @@ class VideoWriter(FrameProcess):
         """ "
         Saves a dataframe containing the timestamps of all the frames.
         Can be extended by subclasses for other logic that should be executed upon finishing the recording.
-
         Parameters
         ----------
         filename
@@ -183,17 +179,12 @@ class VideoWriter(FrameProcess):
         Getter for the filename_base variable.
         This allows the filename to be accessible to subclasses, but prevent them from changing it
         (as long as the conventions are followed).
-
         Returns
         -------
         the filename_base variable.
         """
-        filename = self.__filename_base
-        detailed_name = str(filename.parts[-2]) + "_" + str(filename.name)
-        directory = filename.parent
-        new_filename_base = directory / detailed_name
 
-        return new_filename_base
+        return self.__filename_base
 
 
 class H5VideoWriter(VideoWriter):
@@ -262,7 +253,6 @@ class StreamingVideoWriter(VideoWriter):
     def __generate_filename(self, filename: str) -> str:
         """
         Generates the filename dependent on the given filename and the extension.
-
         Parameters
         ----------
         filename
@@ -273,7 +263,6 @@ class StreamingVideoWriter(VideoWriter):
     def _configure(self, shape: np.ndarray.shape) -> None:
         """
         Sets up a container and stream to save the files to, using the format and parameters set on initialisation.
-
         Parameters
         ----------
         shape
@@ -314,7 +303,6 @@ class StreamingVideoWriter(VideoWriter):
         """
         Completes the recording process and closes the container.
         If the fallback filename was used, but the new filename has been retrieved, it will rename the file.
-
         Parameters
         ----------
         filename
