@@ -1053,10 +1053,13 @@ class CurvedScreenMultipleCirclesStimulus(VisualStimulus, DynamicStimulus):
         *args,
         origin=(0.5, 0.5),
         radius=10,
-        background_color=(0, 0, 0),
-        circle_color=(255, 255, 255),
+        background_color=(177.5, 177.5, 177.5),
+        circle_darkest_color=(57.5, 57.5, 57.5),
+        circle_brightest_color=(97.5, 97.5, 97.5),
+        circle_average_color=(77.5, 77.5, 77.5),
         curved_screen=False,
         max_loom_diameter=180,
+        single_or_multiple_circles="multiple",
         inner_circles_velocity="constant",
         constant_circles_interval=10,
         faster_circles_start_interval=5,
@@ -1070,10 +1073,13 @@ class CurvedScreenMultipleCirclesStimulus(VisualStimulus, DynamicStimulus):
         self.y = origin[1]
         self.radius = radius
         self.background_color = background_color
-        self.circle_color = circle_color
+        self.circle_darkest_color = circle_darkest_color
+        self.circle_brightest_color = circle_brightest_color
+        self.circle_average_color = circle_average_color
         self.name = "circle"
         self.curved_screen = curved_screen
         self.max_loom_radius = max_loom_diameter / 2
+        self.single_or_multiple_circles = single_or_multiple_circles
         self.inner_circles_velocity = inner_circles_velocity
         self.constant_circles_interval = constant_circles_interval
         self.faster_circles_start_interval = faster_circles_start_interval
@@ -1104,57 +1110,66 @@ class CurvedScreenMultipleCirclesStimulus(VisualStimulus, DynamicStimulus):
         self.clip(p, w, h)
         p.drawRect(QRect(-1, -1, w + 2, h + 2))
 
-        if self.inner_circles_velocity == "constant":
+        if self.single_or_multiple_circles == "single":
+            # draw the circle in the same way as for CurvedScreenCircleStimulus
+            p.setBrush(QBrush(QColor(*self.circle_average_color)))
+            p.drawEllipse(QPointF(x, y),
+                          self.radius / mm_px, self.radius / mm_px)
 
-            distances = self.constant_circles_interval
-            n_circles = math.floor(self.radius / distances) + 1
+        elif self.single_or_multiple_circles == "multiple":
 
-            for i in range(n_circles - 1):
-                # draw the circle
-                i_circle_color = self.circle_color[1] + i * 10
-                # CHANGE contrasts
+            if self.inner_circles_velocity == "constant":
 
-                p.setBrush(QBrush(QColor(i_circle_color, i_circle_color, i_circle_color, 255)))
-                p.drawEllipse(QPointF(x, y),
-                              (self.radius - distances * i) / mm_px, (self.radius - distances * i) / mm_px)
+                distances = self.constant_circles_interval
+                n_circles = math.floor(self.radius / distances) + 1
 
-        elif self.inner_circles_velocity == "faster":
-            starting_intervals = self.faster_circles_start_interval
-            ending_intervals = self.faster_circles_end_interval
-            n_circles = math.ceil(max_loom_radius / ending_intervals)
+                for i in range(n_circles - 1):
+                    if i % 2 == 0:
+                        i_circle_color = self.circle_darkest_color[1]
+                    else:
+                        i_circle_color = self.circle_brightest_color[1]
 
-            # draw the circles
-            for i in range(n_circles - 1):
-
-                if i % 2 == 0:
-                    i_circle_color = self.circle_color[1]
-                else:
-                    i_circle_color = self.background_color[1]
-
-                i_circle_radius = self.radius - (i * starting_intervals * (max_loom_radius - self.radius)/max_loom_radius + i * ending_intervals)
-
-                if i_circle_radius > 0:
                     p.setBrush(QBrush(QColor(i_circle_color, i_circle_color, i_circle_color, 255)))
                     p.drawEllipse(QPointF(x, y),
-                                  i_circle_radius / mm_px, i_circle_radius / mm_px)
+                                  (self.radius - distances * i) / mm_px, (self.radius - distances * i) / mm_px)
 
-        else:
-            n_circles = self.slower_circles_n
+            elif self.inner_circles_velocity == "faster":
+                starting_intervals = self.faster_circles_start_interval
+                ending_intervals = self.faster_circles_end_interval
+                n_circles = math.ceil(max_loom_radius / ending_intervals)
 
-            # draw the circles
-            for i in range(n_circles - 1):
+                # draw the circles
+                for i in range(n_circles - 1):
 
-                if i % 2 == 0:
-                    i_circle_color = self.circle_color[1]
-                else:
-                    i_circle_color = self.background_color[1]
+                    if i % 2 == 0:
+                        i_circle_color = self.circle_darkest_color[1]
+                    else:
+                        i_circle_color = self.circle_brightest_color[1]
 
-                i_circle_radius = self.radius * self.slower_circles_slowing_rate ** (i * self.radius / max_loom_radius)
+                    i_circle_radius = self.radius - (i * starting_intervals * (max_loom_radius - self.radius)/max_loom_radius + i * ending_intervals)
 
-                if i_circle_radius > 0:
-                    p.setBrush(QBrush(QColor(i_circle_color, i_circle_color, i_circle_color, 255)))
-                    p.drawEllipse(QPointF(x, y),
-                                  i_circle_radius / mm_px, i_circle_radius / mm_px)
+                    if i_circle_radius > 0:
+                        p.setBrush(QBrush(QColor(i_circle_color, i_circle_color, i_circle_color, 255)))
+                        p.drawEllipse(QPointF(x, y),
+                                      i_circle_radius / mm_px, i_circle_radius / mm_px)
+
+            elif self.inner_circles_velocity == "slower":
+                n_circles = self.slower_circles_n
+
+                # draw the circles
+                for i in range(n_circles - 1):
+
+                    if i % 2 == 0:
+                        i_circle_color = self.circle_darkest_color[1]
+                    else:
+                        i_circle_color = self.circle_brightest_color[1]
+
+                    i_circle_radius = self.radius * self.slower_circles_slowing_rate ** (i * self.radius / max_loom_radius)
+
+                    if i_circle_radius > 0:
+                        p.setBrush(QBrush(QColor(i_circle_color, i_circle_color, i_circle_color, 255)))
+                        p.drawEllipse(QPointF(x, y),
+                                      i_circle_radius / mm_px, i_circle_radius / mm_px)
 
 
 class FixationCrossStimulus(FullFieldVisualStimulus):
