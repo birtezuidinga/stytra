@@ -248,7 +248,7 @@ class StreamingVideoWriter(VideoWriter):
         self._container = None
         self._stream = None
 
-        self.__container_filename = self.CONST_FALLBACK_FILENAME
+        self.__container_filename = self.__generate_filename(self.CONST_FALLBACK_FILENAME)
 
     def __generate_filename(self, filename: str) -> str:
         """
@@ -274,8 +274,6 @@ class StreamingVideoWriter(VideoWriter):
             self.__container_filename = self.__generate_filename(
                 self._get_filename_base()
             )
-        else:
-            self.__container_filename = self.__generate_filename(self.CONST_FALLBACK_FILENAME)
 
         self._container = av.open(self.__container_filename, mode="w")
         self._stream = self._container.add_stream(
