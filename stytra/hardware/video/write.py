@@ -119,6 +119,7 @@ class VideoWriter(FrameProcess):
         Runs the necessary configuration before the recording starts.
         Sets the filename of the video file.
         Can be extended by subclasses for additional configuration.
+
         Parameters
         ----------
         size
@@ -138,6 +139,7 @@ class VideoWriter(FrameProcess):
     def _ingest_frame(self, frame: np.ndarray) -> None:
         """ "
         Abstract method that should contain logic to process (and potentially save) the frame.
+
         Parameters
         ----------
         frame
@@ -149,6 +151,7 @@ class VideoWriter(FrameProcess):
         """ "
         Saves a dataframe containing the timestamps of all the frames.
         Can be extended by subclasses for other logic that should be executed upon finishing the recording.
+
         Parameters
         ----------
         filename
@@ -179,6 +182,7 @@ class VideoWriter(FrameProcess):
         Getter for the filename_base variable.
         This allows the filename to be accessible to subclasses, but prevent them from changing it
         (as long as the conventions are followed).
+
         Returns
         -------
         the filename_base variable.
@@ -253,6 +257,7 @@ class StreamingVideoWriter(VideoWriter):
     def __generate_filename(self, filename: str) -> str:
         """
         Generates the filename dependent on the given filename and the extension.
+
         Parameters
         ----------
         filename
@@ -263,6 +268,7 @@ class StreamingVideoWriter(VideoWriter):
     def _configure(self, shape: np.ndarray.shape) -> None:
         """
         Sets up a container and stream to save the files to, using the format and parameters set on initialisation.
+
         Parameters
         ----------
         shape
@@ -297,12 +303,13 @@ class StreamingVideoWriter(VideoWriter):
         super()._reset()
         self._container = None
         self._stream = None
-        self.__container_filename = self.CONST_FALLBACK_FILENAME
+        self.__container_filename = self.__generate_filename(self.CONST_FALLBACK_FILENAME)
 
     def _complete(self, filename: str) -> None:
         """
         Completes the recording process and closes the container.
         If the fallback filename was used, but the new filename has been retrieved, it will rename the file.
+
         Parameters
         ----------
         filename
