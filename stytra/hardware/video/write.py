@@ -100,11 +100,11 @@ class VideoWriter(FrameProcess):
                     # Since the filename is given asynchronously, check if we have the filename.
                     # Otherwise, use the fallback.
                     if self.__filename_base is not None:
-                        self._complete(self._get_filename_base())
+                        self._complete(self.__filename_base)
                     else:
                         try:
                             self.__filename_base = self.filename_queue.get(timeout=1)
-                            self._complete(self.__filename_base())
+                            self._complete(self.__filename_base)
                         except Empty:
                             self._complete(self.CONST_FALLBACK_FILENAME)
 
@@ -131,7 +131,6 @@ class VideoWriter(FrameProcess):
         if self.__filename_base is None:
             try:
                 self.__filename_base = self.filename_queue.get(timeout=0.01)
-
             except Empty:
                 # Try again later.
                 pass
@@ -188,12 +187,8 @@ class VideoWriter(FrameProcess):
         -------
         the filename_base variable.
         """
-        filename = self.__filename_base
-        detailed_name = str(filename.parts[-2]) + "_" + str(filename.name)
-        directory = filename.parent
-        new_filename_base = directory / detailed_name
 
-        return new_filename_base
+        return self.__filename_base
 
 
 class H5VideoWriter(VideoWriter):
@@ -257,7 +252,7 @@ class StreamingVideoWriter(VideoWriter):
         self._container = None
         self._stream = None
 
-        self.__container_filename = self.CONST_FALLBACK_FILENAME
+        self.__container_filename = self.__generate_filename(self.CONST_FALLBACK_FILENAME)
 
     def __generate_filename(self, filename: str) -> str:
         """
@@ -308,7 +303,7 @@ class StreamingVideoWriter(VideoWriter):
         super()._reset()
         self._container = None
         self._stream = None
-        self.__container_filename = self.CONST_FALLBACK_FILENAME
+        self.__container_filename = self.__generate_filename(self.CONST_FALLBACK_FILENAME)
 
     def _complete(self, filename: str) -> None:
         """
