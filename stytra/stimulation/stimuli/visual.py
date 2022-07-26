@@ -665,6 +665,57 @@ class RadialSineStimulus(VisualStimulus):
         p.drawImage(QPoint(0, 0), qimage2ndarray.array2qimage(self.image))
 
 
+class RadialSineExpansionStimulus(VisualStimulus, DynamicStimulus):
+    """Circular grating pattern that expands from the given origin. Negative velocities would make it retract.
+    Meant to be used on a curved screen spanning 180 degrees of visual space for the observer horizontally.
+    Velocity and period of the grating is therefore given in degrees.
+
+    """
+
+    def __init__(self, period=8, velocity_circles=5, contrast=20, duration=1, origin=(0.5,0.5), wave_type="sine", **kwargs):
+        super().__init__(dynamic_parameters=['velocity_circles'], **kwargs)
+        self.phase = 0
+        self.velocity = velocity_circles
+        self.duration = duration
+        self.period = period
+        self.phase_rad_shift = 0
+        self.image = None
+        self.name = "radial_sine_expanding"
+        self._dt = 0
+        self._past_t = 0
+        self.contrast = contrast
+        self.x = origin[0]
+        self.y = origin[1]
+        self.wave_type = wave_type
+
+    def paint(self, p, w, h):
+        origin_x = self.x
+        origin_y = self.y
+
+        period_mm = self.period / 180 * w * self._experiment.calibrator.mm_px
+        velocity_mm = self.velocity / 180 * w * self._experiment.calibrator.mm_px
+        velocity_rad = velocity_mm / period_mm * 2 * np.pi
+
+        self._dt = self._elapsed - self._past_t
+        self._past_t = self._elapsed
+        self.phase_rad_shift += velocity_rad * self._dt
+
+        x = (np.arange(w) - w * origin_x) * self._experiment.calibrator.mm_px / period_mm * 2 * np.pi
+        y = (np.arange(h) - h * origin_y) * self._experiment.calibrator.mm_px / period_mm * 2 * np.pi
+
+        phase_start = np.sqrt(x[None, :] ** 2 + y[:, None] ** 2)
+
+        self.image = np.round(
+            np.sin(
+                (phase_start - self.phase_rad_shift)
+            ) * self.contrast/2 + 127.5).astype(np.uint8)
+
+        if self.wave_type == "square":
+            self.image = np.where(self.image > 127.5, 127.5 + self.contrast/2, 127.5 - self.contrast/2)
+
+        p.drawImage(QPoint(0, 0), qimage2ndarray.array2qimage(self.image))
+
+
 class FishOverlayStimulus(PositionStimulus):
     """For testing freely-swimming closed loop, draws a fish in the corresponding
     region on the projector.
