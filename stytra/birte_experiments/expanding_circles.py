@@ -40,7 +40,6 @@ class CombinedExpandingCirclesTriggerPixel(Protocol):
         velocity_circles = pd.DataFrame(
             dict(
                 t=[0, start_trigger_duration, start_trigger_duration, last_t, last_t, last_t + 4],
-                #
                 velocity=[0, 0, velocity, velocity, 0, 0]))
 
         stimulus_circles = ExpandingCirclesStimulus(
