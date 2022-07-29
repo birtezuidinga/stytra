@@ -1223,6 +1223,83 @@ class CurvedScreenMultipleCirclesStimulus(VisualStimulus, DynamicStimulus):
                                       i_circle_radius / mm_px, i_circle_radius / mm_px)
 
 
+class ContinuousCirclesStimulus(VisualStimulus, DynamicStimulus):
+    """ A filled circle stimulus that all expand or retract continuously.
+
+    Parameters
+    ---------
+    origin : tuple(float, float)
+        positions of the circle centre (as fraction of screen size)
+
+    radius : float
+        circle radius (in deg for curved_screen == True, in mm for curved_screen == False)
+
+    background_color : tuple(int, int, int)
+        RGB color of the background
+
+    circle_color : tuple(int, int, int)
+        RGB color of the circle
+
+    """
+
+    def __init__(
+        self,
+        *args,
+        expansion_velocity=30,
+        contrast=50,
+        period=30,
+        origin=(0.5, 0.5),
+        circles_n=100,
+        wave_type="sine",
+        **kwargs
+    ):
+        super().__init__(*args, dynamic_parameters=["expansion_velocity"], **kwargs)
+        self.expansion_velocity = expansion_velocity
+        self.x = origin[0]
+        self.y = origin[1]
+        self.contrast = contrast
+        self.wave_type = wave_type
+        self.period = period
+        self.circles_n = circles_n
+        self.name = "continuous_moving_circles_expanding"
+        self._dt = 0
+        self._past_t = 0
+        self.phase_rad_shift = 0
+        self.contrast = contrast
+
+    def paint(self, p, w, h):
+        super().paint(p, w, h)
+
+        period_mm = self.period / 180 * w * self._experiment.calibrator.mm_px
+        velocity_mm = self.expansion_velocity / 180 * w * self._experiment.calibrator.mm_px
+        velocity_rad = velocity_mm / period_mm * 2 * np.pi
+        print(velocity_rad)
+
+        self._dt = self._elapsed - self._past_t
+        self._past_t = self._elapsed
+        self.phase_rad_shift += velocity_rad * self._dt
+        x = self.x * w
+        y = self.y * h
+
+        diagonal_size = np.sqrt(w ** 2 + h ** 2)
+        distances = diagonal_size / self.circles_n
+
+        for i in range(self.circles_n, -1, -1):
+            circle_size = int(diagonal_size - (diagonal_size - distances * i / 2))
+            circle_size_mm = circle_size * self._experiment.calibrator.mm_px
+            circle_size_rad = circle_size_mm / period_mm * 2 * np.pi
+            phase_start = circle_size_rad
+
+            color_i = np.round(
+                np.sin(
+                    (phase_start - self.phase_rad_shift)
+                ) * self.contrast / 2 + 127.5).astype(np.uint8)
+            p.setBrush(QBrush(QColor(color_i, color_i, color_i, 255)))
+            p.setPen(QPen(QColor(0, 0, 0, 0)))
+            p.drawEllipse(QPointF(x, y),
+                          circle_size, circle_size)
+
+
 class FixationCrossStimulus(FullFieldVisualStimulus):
     """Draws a simple cross in the center of the visual field"""
 
