@@ -1273,7 +1273,6 @@ class ContinuousCirclesStimulus(VisualStimulus, DynamicStimulus):
         period_mm = self.period / 180 * w * self._experiment.calibrator.mm_px
         velocity_mm = self.expansion_velocity / 180 * w * self._experiment.calibrator.mm_px
         velocity_rad = velocity_mm / period_mm * 2 * np.pi
-        print(velocity_rad)
 
         self._dt = self._elapsed - self._past_t
         self._past_t = self._elapsed
