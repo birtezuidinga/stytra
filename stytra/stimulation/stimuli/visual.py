@@ -5,8 +5,6 @@ import pims
 import qimage2ndarray
 from pathlib import Path
 import math
-import cv2
-from PIL import Image
 
 from PyQt5.QtCore import QPoint, QRect, QPointF, Qt
 from PyQt5.QtGui import QPainter, QBrush, QColor, QPen, QTransform, QPolygon, QRegion
@@ -674,7 +672,7 @@ class RadialSineExpansionStimulus(VisualStimulus, DynamicStimulus):
 
     """
 
-    def __init__(self, period=8, velocity_circles=5, contrast=20, duration=1, origin=(0.5,0.5), wave_type="sine", resolution_reduction_factor=5, **kwargs):
+    def __init__(self, period=8, velocity_circles=5, contrast=20, duration=1, origin=(0.5,0.5), wave_type="sine", **kwargs):
         super().__init__(dynamic_parameters=['velocity_circles'], **kwargs)
         self.phase = 0
         self.velocity = velocity_circles
@@ -689,23 +687,22 @@ class RadialSineExpansionStimulus(VisualStimulus, DynamicStimulus):
         self.x = origin[0]
         self.y = origin[1]
         self.wave_type = wave_type
-        self.resolution_reduction_factor = resolution_reduction_factor
 
     def paint(self, p, w, h):
-        factor_smaller = 1 / self.resolution_reduction_factor
         origin_x = self.x
         origin_y = self.y
 
-        period_mm = self.period / 180 * w * self._experiment.calibrator.mm_px * factor_smaller
-        velocity_mm = self.velocity / 180 * w * self._experiment.calibrator.mm_px * factor_smaller
+        period_mm = self.period / 180 * w * self._experiment.calibrator.mm_px
+        velocity_mm = self.velocity / 180 * w * self._experiment.calibrator.mm_px
         velocity_rad = velocity_mm / period_mm * 2 * np.pi
 
         self._dt = self._elapsed - self._past_t
         self._past_t = self._elapsed
         self.phase_rad_shift += velocity_rad * self._dt
 
-        x = (np.arange(w * factor_smaller) - w * factor_smaller * origin_x) * self._experiment.calibrator.mm_px / period_mm * 2 * np.pi
-        y = (np.arange(h * factor_smaller) - h * factor_smaller * origin_y) * self._experiment.calibrator.mm_px / period_mm * 2 * np.pi
+        x = (np.arange(w) - w * origin_x) * self._experiment.calibrator.mm_px / period_mm * 2 * np.pi
+        y = (np.arange(h) - h * origin_y) * self._experiment.calibrator.mm_px / period_mm * 2 * np.pi
+
         phase_start = np.sqrt(x[None, :] ** 2 + y[:, None] ** 2)
 
         self.image = np.round(
@@ -715,8 +712,7 @@ class RadialSineExpansionStimulus(VisualStimulus, DynamicStimulus):
 
         if self.wave_type == "square":
             self.image = np.where(self.image > 127.5, 127.5 + self.contrast/2, 127.5 - self.contrast/2)
-        self.image = np.repeat(self.image, self.resolution_reduction_factor, axis=1)
-        self.image = np.repeat(self.image, self.resolution_reduction_factor, axis=0)
+
         p.drawImage(QPoint(0, 0), qimage2ndarray.array2qimage(self.image))
 
 

@@ -25,7 +25,6 @@ class CombinedExpandingCirclesTriggerPixel(Protocol):
         self.wave_type = Param("sine", limits=["sine", "square"])
         self.x_pos = Param(0.5, limits=(0.0, 1.0))
         self.y_pos = Param(0.5, limits=(0.0, 1.0))
-        self.resolution_reduction_factor = Param(5, limits=(1, 500))
 
     def get_stim_sequence(self):
         start_trigger_duration = 2
@@ -49,7 +48,6 @@ class CombinedExpandingCirclesTriggerPixel(Protocol):
                 period=self.period,
                 wave_type=self.wave_type,
                 origin=(self.x_pos, self.y_pos),
-                resolution_reduction_factor=self.resolution_reduction_factor
             )
 
         # Trigger pixel
