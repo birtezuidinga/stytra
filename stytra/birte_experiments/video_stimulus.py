@@ -15,8 +15,8 @@ class VideoProtocol(Protocol):
 
     def get_stim_sequence(self):
         stimuli = []
-        path = '131729_stim_movie.mp4'
-        stimuli.append(VideoStimulus(video_path=path, framerate=9, duration=16))
+        path = 'test3.mp4'
+        stimuli.append(VideoStimulus(video_path=path, framerate=50, duration=10))
 
         return stimuli
 
