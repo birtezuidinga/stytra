@@ -185,7 +185,7 @@ class Pause(FullFieldVisualStimulus):
 class VideoStimulus(VisualStimulus, DynamicStimulus):
     """Displays videos using PIMS, at a specified framerate."""
 
-    def __init__(self, *args, video_path, framerate=None, duration=None, **kwargs):
+    def __init__(self, *args, video_path, framerate=None, duration=None, resolution_reduction_factor=2, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.name = "video"
@@ -200,6 +200,8 @@ class VideoStimulus(VisualStimulus, DynamicStimulus):
 
         self.framerate = framerate
         self.duration = duration
+
+        self.resolution_reduction_factor = resolution_reduction_factor
 
     def initialise_external(self, *args, **kwargs):
         super().initialise_external(*args, **kwargs)
@@ -236,17 +238,10 @@ class VideoStimulus(VisualStimulus, DynamicStimulus):
 
     def paint(self, p, w, h):
         img = qimage2ndarray.array2qimage(self._current_frame)
-        scaling_factor = 2
+        scaling_factor = self.resolution_reduction_factor
         tr = QTransform().scale(scaling_factor, scaling_factor)
         p.setTransform(tr)
-        display_centre = (w / 4, h / 4)
-        p.drawImage(
-            QPoint(
-                display_centre[0] - self._current_frame.shape[1] // 2,
-                display_centre[1] - self._current_frame.shape[0] // 2,
-            ),
-            img,
-        )
+        p.drawImage(QPoint(0, 0), img)
 
 
 class PositionStimulus(VisualStimulus, DynamicStimulus):
