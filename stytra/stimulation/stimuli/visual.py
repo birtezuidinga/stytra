@@ -201,9 +201,6 @@ class VideoStimulus(VisualStimulus, DynamicStimulus):
         self.framerate = framerate
         self.duration = duration
 
-    def get_transform(self, factor):
-        return QTransform().scale(factor, factor)
-
     def initialise_external(self, *args, **kwargs):
         super().initialise_external(*args, **kwargs)
         self._video_seq = pims.Video(self._experiment.asset_dir + "/" + self.video_path)
@@ -239,7 +236,8 @@ class VideoStimulus(VisualStimulus, DynamicStimulus):
 
     def paint(self, p, w, h):
         img = qimage2ndarray.array2qimage(self._current_frame)
-        tr = self.get_transform(2)
+        scaling_factor = 2
+        tr = QTransform().scale(scaling_factor, scaling_factor)
         p.setTransform(tr)
         display_centre = (w / 4, h / 4)
         p.drawImage(
