@@ -15,7 +15,7 @@ class VideoProtocol(Protocol):
         super().__init__()
 
         # List all stimuli
-        json_paths = r"C:/Users/zuidinga/PycharmProjects/stytra_birte/stytra/stytra/birte_experiments/assets/stim_videos/20220908_concentric_rings/"
+        json_paths = r"C:/Users/zuidinga/PycharmProjects/stytra_birte/stytra/stytra/birte_experiments/assets/stim_videos/20220909_concentric_rings/"
         json_files = [file for file in os.listdir(json_paths) if file.endswith('.json')]
         dfs = []  # an empty list to store the data frames
         for file in json_files:
@@ -50,7 +50,7 @@ class VideoProtocol(Protocol):
         stimulus = self.stimulus
         stimulus_index = self.unique_stimuli_list.index(stimulus)
         video_name = self.unique_stimuli.loc[stimulus_index, 'name']
-        path = 'stim_videos/20220908_concentric_rings/' + video_name + '.mp4'
+        path = 'stim_videos/20220909_concentric_rings/' + video_name + '.mp4'
 
         index = self.unique_stimuli_list.index(stimulus)
         name_stimulus = self.unique_stimuli.loc[index, 'name']  # used in queries
