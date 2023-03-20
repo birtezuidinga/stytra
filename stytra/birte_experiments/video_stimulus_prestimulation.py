@@ -48,7 +48,12 @@ class VideoProtocol(Protocol):
     def get_stim_sequence(self):
         stimuli = []
         stimulus = self.stimulus
-        stimulus_index = self.unique_stimuli_list.index(stimulus)
+
+        try:
+            stimulus_index = self.unique_stimuli_list.index(stimulus)
+        except ValueError:
+            print("List does not contain value")
+
         video_name = self.unique_stimuli.loc[stimulus_index, 'name']
         path = 'stim_videos/20230317_rings_prestimulation/' + video_name + '.mp4'
 
