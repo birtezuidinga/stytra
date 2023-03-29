@@ -15,7 +15,7 @@ class VideoProtocol(Protocol):
         super().__init__()
 
         # List all stimuli
-        json_paths = r"assets/stim_videos/20230328_rings_prestimulation/"
+        json_paths = r"assets/stim_videos/20230329_rings_prestimulation/"
         json_files = [file for file in os.listdir(json_paths) if file.endswith('.json')]
         dfs = []  # an empty list to store the data frames
         for file in json_files:
@@ -55,7 +55,7 @@ class VideoProtocol(Protocol):
             print("List does not contain value")
 
         video_name = self.unique_stimuli.loc[stimulus_index, 'name']
-        path = 'stim_videos/20230328_rings_prestimulation/' + video_name + '.mp4'
+        path = 'stim_videos/20230329_rings_prestimulation/' + video_name + '.mp4'
 
         index = self.unique_stimuli_list.index(stimulus)
         name_stimulus = self.unique_stimuli.loc[index, 'name']  # used in queries
