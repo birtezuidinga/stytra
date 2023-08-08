@@ -23,7 +23,7 @@ class CombinedLoomingTriggerPixel(Protocol):
         self.y_pos = Param(0.5, limits=(0.0, 1.0))
         self.ratio_lv = Param(100, limits=(1, 1000))
         self.max_loom_diameter = Param(180, limits=(1, 180))
-        self.contrast = Param(50, limits=(0, 255))
+        self.contrast = Param(50, limits=(-255, 255))
         self.looming_duration = Param(25, limits=(1, 1000.0))
 
     def get_stim_sequence(self):
