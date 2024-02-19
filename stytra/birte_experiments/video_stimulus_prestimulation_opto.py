@@ -9,13 +9,12 @@ import pandas as pd
 
 
 class VideoProtocol(Protocol):
-    name = "video_stimulus_concentric_rings"
-
+    name = "video_stimulus_prestimulation_opto"
     def __init__(self):
         super().__init__()
 
         # List all stimuli
-        json_paths = r"C:/Users/grolab/PycharmProjects/stytra/stytra/birte_experiments/assets/stim_videos/20220909_rings_and_black_screen/"
+        json_paths = r"assets/stim_videos/20240219_prestimulation_opto/"
         json_files = [file for file in os.listdir(json_paths) if file.endswith('.json')]
         dfs = []  # an empty list to store the data frames
         for file in json_files:
@@ -34,10 +33,12 @@ class VideoProtocol(Protocol):
         unique_stimuli = unique_stimuli.drop(cols_to_drop, axis=1)
         cols_to_sort = unique_stimuli.drop(columns="name").columns.values.tolist()
         unique_stimuli = unique_stimuli.sort_values(by=cols_to_sort).reset_index().drop(columns="index")
+        unique_stimuli = unique_stimuli.astype(str).apply(lambda x: x.name + '_' + x)
+        unique_stimuli["name"] = unique_stimuli["name"].str.replace('name_', '')
+        unique_stimuli["combined"] = unique_stimuli.drop(columns='name').astype(str).apply(lambda x: '_'.join(x), axis=1)
+        unique_stimuli = unique_stimuli[["name", "combined"]]
 
-        unique_stimuli_list = unique_stimuli.astype(str).apply(lambda x: x.name + '_' + x)
-        unique_stimuli_list = unique_stimuli_list.drop(columns='name')
-        unique_stimuli_list = unique_stimuli_list.values.flatten().tolist()
+        unique_stimuli_list = unique_stimuli["combined"].values.flatten().tolist()
 
         self.stimulus = Param(value=unique_stimuli_list[0], limits=unique_stimuli_list)
         self.json_paths = json_paths
@@ -49,8 +50,10 @@ class VideoProtocol(Protocol):
         stimuli = []
         stimulus = self.stimulus
         stimulus_index = self.unique_stimuli_list.index(stimulus)
+        print(stimulus_index)
+
         video_name = self.unique_stimuli.loc[stimulus_index, 'name']
-        path = 'stim_videos/20220909_rings_and_black_screen/' + video_name + '.mp4'
+        path = 'stim_videos/20240219_prestimulation_opto/' + video_name + '.mp4'
 
         index = self.unique_stimuli_list.index(stimulus)
         name_stimulus = self.unique_stimuli.loc[index, 'name']  # used in queries
